@@ -10,6 +10,8 @@ export interface WeatherViewElements {
 
 function setStatus(elements: WeatherViewElements, state: string, title: string, message: string): void {
   elements.status.dataset.state = state
+  elements.status.setAttribute('role', state === 'error' ? 'alert' : 'status')
+  elements.status.setAttribute('aria-live', state === 'error' ? 'assertive' : 'polite')
   elements.status.querySelector<HTMLElement>('.status-title')!.textContent = title
   elements.status.querySelector<HTMLElement>('.status-message')!.textContent = message
   elements.status.hidden = false
@@ -94,20 +96,21 @@ export function renderWeatherApp(container: HTMLElement): WeatherViewElements {
               type="search"
               placeholder="Ex.: São Paulo"
               autocomplete="address-level2"
+              aria-controls="weather-result"
               required
             />
-            <button type="submit">Buscar clima</button>
+            <button type="submit" aria-controls="weather-result">Buscar clima</button>
           </div>
         </form>
       </header>
 
-      <section class="weather-content" aria-live="polite" aria-atomic="true">
-        <div class="status-panel" data-state="empty">
+      <section class="weather-content" aria-busy="false">
+        <div class="status-panel" data-state="empty" role="status" aria-live="polite" aria-atomic="true">
           <h2 class="status-title">Consulte o clima de uma cidade</h2>
           <p class="status-message">Pesquise uma cidade para consultar o clima atual.</p>
         </div>
 
-        <section class="weather-result" aria-labelledby="result-title" hidden>
+        <section id="weather-result" class="weather-result" aria-labelledby="result-title" hidden>
           <aside class="weather-summary">
             <p class="eyebrow">Agora em</p>
             <h2 id="result-title" data-field="city"></h2>

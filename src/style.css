@@ -25,7 +25,7 @@ body {
 
 button, input { font: inherit; }
 
-button, input:focus-visible {
+button:focus-visible, input:focus-visible {
   outline: 3px solid #f0c36a;
   outline-offset: 3px;
 }
@@ -43,7 +43,7 @@ button {
 }
 
 button:hover:not(:disabled) { background: var(--accent-dark); transform: translateY(-1px); }
-button:disabled, input:disabled { cursor: wait; opacity: 0.65; }
+button:disabled, input:disabled { cursor: not-allowed; opacity: 0.65; }
 
 #app { min-height: 100vh; }
 
@@ -94,6 +94,7 @@ button:disabled, input:disabled { cursor: wait; opacity: 0.65; }
 .status-panel { min-height: 220px; padding: 4rem 2rem; text-align: center; }
 .status-panel[data-state='loading'] { background: #e7f2ef; }
 .status-panel[data-state='error'] { color: var(--warning); background: #fff0eb; }
+.status-panel[data-state='error']::before { content: 'Atenção: '; font-weight: 700; }
 .status-title { margin: 0 0 0.5rem; color: var(--ink); font-family: Georgia, serif; font-size: 1.75rem; }
 .status-message { color: var(--muted); }
 
@@ -124,5 +125,11 @@ button:disabled, input:disabled { cursor: wait; opacity: 0.65; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
 }

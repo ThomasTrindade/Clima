@@ -72,19 +72,19 @@ Execute as tarefas na ordem apresentada. Cada agente deve trabalhar em uma taref
 
 ## 12. Revisar acessibilidade e preferencias de movimento
 
-- [ ] Completar atributos e comportamentos de acessibilidade para foco, mensagens dinamicas, controles desabilitados, contraste e reducao de movimento.
+- [x] Completar atributos e comportamentos de acessibilidade para foco, mensagens dinamicas, controles desabilitados, contraste e reducao de movimento.
 - Criterio de aprovacao: o fluxo completo funciona apenas com teclado; loading e erros sao anunciados por `aria-live`; o foco permanece visivel; informacoes de dia/noite, erro e condicao nao dependem apenas de cor; `prefers-reduced-motion` reduz ou remove animacoes.
 - Referencia: PRD, RNF-02 e criterios 10 e 11.
 
 ## 13. Tratar falhas de rede, HTTP, timeout e parsing
 
-- [ ] Garantir tratamento uniforme para timeout, erro de rede, status HTTP nao bem-sucedido, JSON invalido e parametros ausentes na camada de API.
+- [x] Garantir tratamento uniforme para timeout, erro de rede, status HTTP nao bem-sucedido, JSON invalido e parametros ausentes na camada de API.
 - Criterio de aprovacao: nenhuma dessas falhas quebra a aplicacao ou expoe detalhes tecnicos ao usuario; a UI mostra o erro generico acionavel definido no PRD e permite uma nova busca.
 - Referencia: PRD, RF-07, RNF-03 e secao 6.
 
 ## 14. Validar o fluxo completo
 
-- [ ] Executar testes ou verificacoes para sucesso, busca vazia, cidade inexistente, resposta meteorologica incompleta, falhas de API/rede, busca concorrente e todos os grupos de weather code.
+- [x] Executar testes ou verificacoes para sucesso, busca vazia, cidade inexistente, resposta meteorologica incompleta, falhas de API/rede, busca concorrente e todos os grupos de weather code.
 - Criterio de aprovacao: os cenarios recomendados no PRD passam sem regressao e o resultado bem-sucedido nao contem campos parciais ou textos tecnicos indevidos.
 - Referencia: PRD, secao 9 e Definicao de pronto.
 

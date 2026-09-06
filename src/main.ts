@@ -26,6 +26,8 @@ if (app) {
 
     const currentRequestId = ++requestId
     elements.form.dataset.loading = 'true'
+    elements.form.setAttribute('aria-busy', 'true')
+    elements.result.closest<HTMLElement>('.weather-content')?.setAttribute('aria-busy', 'true')
     elements.searchInput.disabled = true
     elements.searchButton.disabled = true
     renderLoadingState(elements)
@@ -37,6 +39,8 @@ if (app) {
     }
 
     elements.form.dataset.loading = 'false'
+    elements.form.setAttribute('aria-busy', 'false')
+    elements.result.closest<HTMLElement>('.weather-content')?.setAttribute('aria-busy', 'false')
     elements.searchInput.disabled = false
     elements.searchButton.disabled = false
 

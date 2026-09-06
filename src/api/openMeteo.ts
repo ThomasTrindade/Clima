@@ -11,6 +11,7 @@ import { describeWeatherCode } from '../weather/weatherCode.ts'
 
 export const GEOCODING_API_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 export const FORECAST_API_URL = 'https://api.open-meteo.com/v1/forecast'
+export const REQUEST_TIMEOUT_MS = 10_000
 
 const CURRENT_FIELDS = [
 	'precipitation_probability',
@@ -80,17 +81,21 @@ function isCurrentWeatherUnits(value: unknown): value is CurrentWeatherUnits {
 		return false
 	}
 
-	return [
+	const requiredFields = [
 		'temperature_2m',
 		'relative_humidity_2m',
 		'apparent_temperature',
-		'is_day',
 		'wind_speed_10m',
 		'wind_direction_10m',
 		'precipitation_probability',
 		'precipitation',
-		'weather_code',
-	].every((field) => isNonEmptyString(value[field]))
+	]
+
+	return (
+		(isNonEmptyString(value.is_day) || value.is_day === '') &&
+		(value.weather_code === '' || isNonEmptyString(value.weather_code)) &&
+		requiredFields.every((field) => isNonEmptyString(value[field]))
+	)
 }
 
 function isForecastResponse(value: unknown): value is ForecastResponse {
@@ -101,8 +106,27 @@ function isForecastResponse(value: unknown): value is ForecastResponse {
 	)
 }
 
+async function fetchJson(url: URL): Promise<unknown | null> {
+	const controller = new AbortController()
+	const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+
+	try {
+		const response = await fetch(url, { signal: controller.signal })
+
+		if (!response.ok) {
+			return null
+		}
+
+		return await response.json()
+	} catch {
+		return null
+	} finally {
+		clearTimeout(timeoutId)
+	}
+}
+
 export async function searchCity(name: string): Promise<City | null> {
-	const normalizedName = name.trim()
+	const normalizedName = typeof name === 'string' ? name.trim() : ''
 
 	if (!normalizedName) {
 		return null
@@ -116,36 +140,24 @@ export async function searchCity(name: string): Promise<City | null> {
 		format: 'json',
 	}).toString()
 
-	try {
-		const response = await fetch(url)
+	const data = await fetchJson(url)
 
-		if (!response.ok) {
-			return null
-		}
-
-		const data: unknown = await response.json()
-
-		if (!isGeocodingResponse(data)) {
-			return null
-		}
-
-		const results = data.results ?? []
-
-		if (results.length === 0) {
-			return null
-		}
-
-		const result = results[0]
-
-		return {
-			name: result.name,
-			latitude: result.latitude,
-			longitude: result.longitude,
-			countryCode: result.country_code,
-			timezone: result.timezone,
-		}
-	} catch {
+	if (!isGeocodingResponse(data)) {
 		return null
+	}
+
+	const result = data.results?.[0]
+
+	if (!result) {
+		return null
+	}
+
+	return {
+		name: result.name,
+		latitude: result.latitude,
+		longitude: result.longitude,
+		countryCode: result.country_code,
+		timezone: result.timezone,
 	}
 }
 
@@ -168,23 +180,13 @@ export async function fetchCurrentWeather(location: City): Promise<CurrentWeathe
 		timezone: location.timezone,
 	}).toString()
 
-	try {
-		const response = await fetch(url)
+	const data = await fetchJson(url)
 
-		if (!response.ok) {
-			return null
-		}
-
-		const data: unknown = await response.json()
-
-		if (!isForecastResponse(data)) {
-			return null
-		}
-
-		return data.current ?? null
-	} catch {
+	if (!isForecastResponse(data)) {
 		return null
 	}
+
+	return data.current ?? null
 }
 
 export async function getWeatherByCity(name: string): Promise<WeatherResult | null> {
@@ -199,7 +201,7 @@ interface CityLookupResult {
 }
 
 async function searchCityResult(name: string): Promise<CityLookupResult> {
-	const normalizedName = name.trim()
+	const normalizedName = typeof name === 'string' ? name.trim() : ''
 
 	if (!normalizedName) {
 		return { city: null, failed: false }
@@ -213,37 +215,27 @@ async function searchCityResult(name: string): Promise<CityLookupResult> {
 		format: 'json',
 	}).toString()
 
-	try {
-		const response = await fetch(url)
+	const data = await fetchJson(url)
 
-		if (!response.ok) {
-			return { city: null, failed: true }
-		}
-
-		const data: unknown = await response.json()
-
-		if (!isGeocodingResponse(data)) {
-			return { city: null, failed: true }
-		}
-
-		const result = data.results?.[0]
-
-		if (!result) {
-			return { city: null, failed: false }
-		}
-
-		return {
-			city: {
-				name: result.name,
-				latitude: result.latitude,
-				longitude: result.longitude,
-				countryCode: result.country_code,
-				timezone: result.timezone,
-			},
-			failed: false,
-		}
-	} catch {
+	if (!isGeocodingResponse(data)) {
 		return { city: null, failed: true }
+	}
+
+	const result = data.results?.[0]
+
+	if (!result) {
+		return { city: null, failed: false }
+	}
+
+	return {
+		city: {
+			name: result.name,
+			latitude: result.latitude,
+			longitude: result.longitude,
+			countryCode: result.country_code,
+			timezone: result.timezone,
+		},
+		failed: false,
 	}
 }
 
@@ -272,23 +264,13 @@ async function fetchForecastResult(location: City): Promise<ForecastLookupResult
 		timezone: location.timezone,
 	}).toString()
 
-	try {
-		const response = await fetch(url)
+	const data = await fetchJson(url)
 
-		if (!response.ok) {
-			return { current: null, units: null, failed: true }
-		}
-
-		const data: unknown = await response.json()
-
-		if (!isForecastResponse(data)) {
-			return { current: null, units: null, failed: true }
-		}
-
-		return { current: data.current ?? null, units: data.current_units ?? null, failed: false }
-	} catch {
+	if (!isForecastResponse(data)) {
 		return { current: null, units: null, failed: true }
 	}
+
+	return { current: data.current ?? null, units: data.current_units ?? null, failed: false }
 }
 
 export async function getWeatherByCityResult(name: string): Promise<WeatherLookupResult> {
