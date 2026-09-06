@@ -12,31 +12,31 @@ Execute as tarefas na ordem apresentada. Cada agente deve trabalhar em uma taref
 
 ## 2. Definir os tipos e contratos de dados
 
-- [ ] Criar os tipos explicitos para cidade, resposta de geocodificacao, clima atual, unidades e resultado normalizado.
+- [x] Criar os tipos explicitos para cidade, resposta de geocodificacao, clima atual, unidades e resultado normalizado.
 - Criterio de aprovacao: os campos necessarios para a interface e para as validacoes da API estao tipados, incluindo numeros, booleanos e strings, sem depender de `any` para o fluxo principal.
 - Referencia: PRD, secoes 3, 6 e 8.
 
 ## 3. Implementar a busca de cidade
 
-- [ ] Implementar a funcao de geocodificacao usando `URL` e `URLSearchParams`, com `count=1`, idioma portugues e validacao da entrada e da resposta.
+- [x] Implementar a funcao de geocodificacao usando `URL` e `URLSearchParams`, com `count=1`, idioma portugues e validacao da entrada e da resposta.
 - Criterio de aprovacao: uma cidade valida retorna somente `name`, `latitude`, `longitude`, `country_code` e `timezone`; nome vazio nao faz requisicao; resposta sem resultado retorna `null` ou falha controlada; o nome e o parametro sao codificados corretamente.
 - Referencia: PRD, RF-01, RF-02 e RNF-03.
 
 ## 4. Implementar a consulta do clima atual
 
-- [ ] Implementar a funcao que consulta o endpoint de forecast com a localizacao validada e os campos `current` definidos no PRD.
+- [x] Implementar a funcao que consulta o endpoint de forecast com a localizacao validada e os campos `current` definidos no PRD.
 - Criterio de aprovacao: a funcao verifica `response.ok`, valida `current`, `current_units` e todos os campos obrigatorios, normaliza apenas os dados necessarios e rejeita respostas incompletas sem produzir clima parcial.
 - Referencia: PRD, RF-03, RNF-03 e secao 6.
 
 ## 5. Compor o fluxo de consulta
 
-- [ ] Implementar a funcao de alto nivel que encadeia geocodificacao e clima como uma unica operacao de negocio.
+- [x] Implementar a funcao de alto nivel que encadeia geocodificacao e clima como uma unica operacao de negocio.
 - Criterio de aprovacao: uma cidade valida dispara exatamente as duas requisicoes na ordem correta; cidade nao encontrada interrompe o fluxo antes da segunda requisicao; falha no clima produz uma falha controlada sem dados incompletos.
 - Referencia: PRD, RF-02, RF-03, RF-04 e criterios 1, 3 e 4.
 
 ## 6. Criar o mapeamento de weather code
 
-- [ ] Implementar a conversao de todos os grupos WMO definidos no PRD para descricoes em portugues.
+- [x] Implementar a conversao de todos os grupos WMO definidos no PRD para descricoes em portugues.
 - Criterio de aprovacao: cada codigo listado no PRD retorna a descricao correspondente e qualquer codigo desconhecido retorna exatamente `Condicao indisponivel`, sem lancar excecao.
 - Referencia: PRD, RF-06 e criterio 8.
 
