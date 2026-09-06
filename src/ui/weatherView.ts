@@ -1,9 +1,82 @@
+import type { WeatherLookupFailureReason, WeatherResult } from '../types/weather.ts'
+
 export interface WeatherViewElements {
   form: HTMLFormElement
   searchInput: HTMLInputElement
   searchButton: HTMLButtonElement
   status: HTMLElement
   result: HTMLElement
+}
+
+function setStatus(elements: WeatherViewElements, state: string, title: string, message: string): void {
+  elements.status.dataset.state = state
+  elements.status.querySelector<HTMLElement>('.status-title')!.textContent = title
+  elements.status.querySelector<HTMLElement>('.status-message')!.textContent = message
+  elements.status.hidden = false
+  elements.result.hidden = true
+}
+
+function setField(elements: WeatherViewElements, field: string, value: string): void {
+  const target = elements.result.querySelector<HTMLElement>(`[data-field="${field}"]`)
+
+  if (target) {
+    target.textContent = value
+  }
+}
+
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(value)
+}
+
+function formatDateTime(dateTime: string): string {
+  const [date, time] = dateTime.split('T')
+  const [year, month, day] = date.split('-')
+
+  return `${day}/${month}/${year} às ${time}`
+}
+
+export function renderEmptyState(elements: WeatherViewElements): void {
+  setStatus(elements, 'empty', 'Consulte o clima de uma cidade', 'Pesquise uma cidade para consultar o clima atual.')
+}
+
+export function renderLoadingState(elements: WeatherViewElements): void {
+  setStatus(elements, 'loading', 'Buscando clima...', 'Aguarde enquanto consultamos a cidade e as condições atuais.')
+}
+
+export function renderErrorState(elements: WeatherViewElements, reason: WeatherLookupFailureReason): void {
+  const messages: Record<WeatherLookupFailureReason, [string, string]> = {
+    'not-found': ['Cidade não encontrada', 'Confira o nome informado e tente novamente.'],
+    'weather-unavailable': ['Clima indisponível', 'Não foi possível carregar o clima desta cidade. Tente novamente.'],
+    generic: ['Não foi possível consultar o clima', 'Verifique sua conexão e tente novamente.'],
+  }
+  const [title, message] = messages[reason]
+
+  setStatus(elements, 'error', title, message)
+}
+
+export function renderWeatherResult(elements: WeatherViewElements, weather: WeatherResult): void {
+  setField(elements, 'city', weather.city)
+  setField(elements, 'country', weather.countryCode.toUpperCase())
+  setField(elements, 'temperature', formatNumber(weather.temperature))
+  setField(elements, 'temperature-unit', weather.units.temperature)
+  setField(elements, 'condition', weather.condition)
+  setField(elements, 'day-state', weather.isDay ? 'Dia' : 'Noite')
+  setField(elements, 'date', formatDateTime(weather.dateTime))
+  setField(elements, 'humidity', formatNumber(weather.humidity))
+  setField(elements, 'humidity-unit', weather.units.humidity)
+  setField(elements, 'apparent-temperature', formatNumber(weather.apparentTemperature))
+  setField(elements, 'apparent-temperature-unit', weather.units.apparentTemperature)
+  setField(elements, 'precipitation', formatNumber(weather.precipitation))
+  setField(elements, 'precipitation-unit', weather.units.precipitation)
+  setField(elements, 'precipitation-probability', formatNumber(weather.precipitationProbability))
+  setField(elements, 'precipitation-probability-unit', weather.units.precipitationProbability)
+  setField(elements, 'wind-speed', formatNumber(weather.windSpeed))
+  setField(elements, 'wind-speed-unit', weather.units.windSpeed)
+  setField(elements, 'wind-direction', formatNumber(weather.windDirection))
+  setField(elements, 'wind-direction-unit', weather.units.windDirection)
+
+  elements.status.hidden = true
+  elements.result.hidden = false
 }
 
 export function renderWeatherApp(container: HTMLElement): WeatherViewElements {

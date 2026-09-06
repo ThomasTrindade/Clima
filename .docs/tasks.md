@@ -48,25 +48,25 @@ Execute as tarefas na ordem apresentada. Cada agente deve trabalhar em uma taref
 
 ## 8. Implementar a renderizacao dos estados
 
-- [ ] Criar as funcoes de UI para renderizar estado vazio, loading, sucesso e erro, limpando o resultado anterior quando uma nova busca comeca.
+- [x] Criar as funcoes de UI para renderizar estado vazio, loading, sucesso e erro, limpando o resultado anterior quando uma nova busca comeca.
 - Criterio de aprovacao: cada estado e visualmente distinguivel e mutuamente consistente; o loading anuncia `Buscando clima...`; erro de cidade, clima indisponivel e falha generica exibem mensagens apropriadas; nenhum painel parcial ou dado antigo permanece visivel.
 - Referencia: PRD, RF-04, RF-05, RF-07 e criterio 5.
 
 ## 9. Exibir o resumo meteorologico
 
-- [ ] Conectar o resultado normalizado a sidebar e metricas, incluindo temperatura, cidade, pais, data no timezone da API, dia/noite, condicao, umidade, sensacao, precipitacao e vento com unidades.
+- [x] Conectar o resultado normalizado a sidebar e metricas, incluindo temperatura, cidade, pais, data no timezone da API, dia/noite, condicao, umidade, sensacao, precipitacao e vento com unidades.
 - Criterio de aprovacao: uma resposta valida exibe todos os campos obrigatorios nas areas corretas; `is_day=1` aparece como `Dia`, `is_day=0` como `Noite`; a data nao depende do timezone local do navegador; a direcao do vento mantem os graus visiveis.
 - Referencia: PRD, RF-05, secao 6 e criterios 6 e 7.
 
 ## 10. Conectar formulario, teclado e concorrencia
 
-- [ ] Implementar submit pelo botao e pela tecla Enter, normalizacao de espacos, bloqueio ou cancelamento de busca em andamento e protecao contra respostas fora de ordem.
+- [x] Implementar submit pelo botao e pela tecla Enter, normalizacao de espacos, bloqueio ou cancelamento de busca em andamento e protecao contra respostas fora de ordem.
 - Criterio de aprovacao: busca vazia nao chama a API; o formulario permanece utilizavel para nova tentativa; durante o loading nao ha buscas concorrentes; uma resposta antiga nunca substitui o resultado da busca mais recente.
 - Referencia: PRD, RF-01, RF-04 e RNF-03.
 
 ## 11. Aplicar o layout visual responsivo
 
-- [ ] Implementar os estilos do PRD para fundo, painel central, sidebar, grade de metricas, foco visivel e reorganizacao em telas pequenas.
+- [x] Implementar os estilos do PRD para fundo, painel central, sidebar, grade de metricas, foco visivel e reorganizacao em telas pequenas.
 - Criterio de aprovacao: em desktop o conteudo fica centralizado com largura maxima de 800px e duas colunas; em viewport mobile as areas ficam verticais sem overflow horizontal; valores e controles nao ficam cortados nem causam salto de layout.
 - Referencia: PRD, RNF-01, secao 7 e criterio 9.
 
