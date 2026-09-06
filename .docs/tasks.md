@@ -90,6 +90,6 @@ Execute as tarefas na ordem apresentada. Cada agente deve trabalhar em uma taref
 
 ## 15. Fazer a verificacao final de entrega
 
-- [ ] Revisar o fluxo manual em desktop e mobile e executar o build de producao.
+- [x] Revisar o fluxo manual em desktop e mobile e executar o build de producao.
 - Criterio de aprovacao: `npm run build` termina sem erros; o fluxo de vazio, loading, sucesso e erro funciona; nao ha rolagem horizontal em viewport mobile; todos os criterios de aceitacao e a Definicao de pronto do PRD estao atendidos.
 - Referencia: PRD, secao 8 e Definicao de pronto.

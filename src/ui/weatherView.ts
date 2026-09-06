@@ -1,6 +1,6 @@
 import type { WeatherLookupFailureReason, WeatherResult } from '../types/weather.ts'
 
-export interface WeatherViewElements {
+export type WeatherViewElements = {
   form: HTMLFormElement
   searchInput: HTMLInputElement
   searchButton: HTMLButtonElement

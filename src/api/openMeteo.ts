@@ -195,7 +195,7 @@ export async function getWeatherByCity(name: string): Promise<WeatherResult | nu
 	return result.ok ? result.weather : null
 }
 
-interface CityLookupResult {
+type CityLookupResult = {
 	city: City | null
 	failed: boolean
 }
@@ -239,7 +239,7 @@ async function searchCityResult(name: string): Promise<CityLookupResult> {
 	}
 }
 
-interface ForecastLookupResult {
+type ForecastLookupResult = {
 	current: CurrentWeather | null
 	units: CurrentWeatherUnits | null
 	failed: boolean

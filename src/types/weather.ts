@@ -1,4 +1,4 @@
-export interface City {
+export type City = {
   name: string
   latitude: number
   longitude: number
@@ -6,7 +6,7 @@ export interface City {
   timezone: string
 }
 
-export interface GeocodedCity {
+export type GeocodedCity = {
   name: string
   latitude: number
   longitude: number
@@ -14,11 +14,11 @@ export interface GeocodedCity {
   timezone: string
 }
 
-export interface GeocodingResponse {
+export type GeocodingResponse = {
   results?: GeocodedCity[] | null
 }
 
-export interface CurrentWeatherUnits {
+export type CurrentWeatherUnits = {
   temperature_2m: string
   relative_humidity_2m: string
   apparent_temperature: string
@@ -30,7 +30,7 @@ export interface CurrentWeatherUnits {
   weather_code: string
 }
 
-export interface CurrentWeather {
+export type CurrentWeather = {
   time: string
   temperature_2m: number
   relative_humidity_2m: number
@@ -43,12 +43,12 @@ export interface CurrentWeather {
   weather_code: number
 }
 
-export interface ForecastResponse {
+export type ForecastResponse = {
   current?: CurrentWeather | null
   current_units?: CurrentWeatherUnits | null
 }
 
-export interface WeatherResult {
+export type WeatherResult = {
   city: string
   countryCode: string
   timezone: string
@@ -66,7 +66,7 @@ export interface WeatherResult {
   units: WeatherResultUnits
 }
 
-export interface WeatherResultUnits {
+export type WeatherResultUnits = {
   temperature: string
   humidity: string
   apparentTemperature: string
