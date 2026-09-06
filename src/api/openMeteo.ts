@@ -5,6 +5,7 @@ import type {
 	ForecastResponse,
 	GeocodingResponse,
 	WeatherResult,
+	WeatherLookupResult,
 } from '../types/weather.ts'
 import { describeWeatherCode } from '../weather/weatherCode.ts'
 
@@ -187,32 +188,161 @@ export async function fetchCurrentWeather(location: City): Promise<CurrentWeathe
 }
 
 export async function getWeatherByCity(name: string): Promise<WeatherResult | null> {
-	const city = await searchCity(name)
+	const result = await getWeatherByCityResult(name)
 
-	if (!city) {
-		return null
+	return result.ok ? result.weather : null
+}
+
+interface CityLookupResult {
+	city: City | null
+	failed: boolean
+}
+
+async function searchCityResult(name: string): Promise<CityLookupResult> {
+	const normalizedName = name.trim()
+
+	if (!normalizedName) {
+		return { city: null, failed: false }
 	}
 
-	const current = await fetchCurrentWeather(city)
+	const url = new URL(GEOCODING_API_URL)
+	url.search = new URLSearchParams({
+		name: normalizedName,
+		count: '1',
+		language: 'pt',
+		format: 'json',
+	}).toString()
 
-	if (!current) {
-		return null
+	try {
+		const response = await fetch(url)
+
+		if (!response.ok) {
+			return { city: null, failed: true }
+		}
+
+		const data: unknown = await response.json()
+
+		if (!isGeocodingResponse(data)) {
+			return { city: null, failed: true }
+		}
+
+		const result = data.results?.[0]
+
+		if (!result) {
+			return { city: null, failed: false }
+		}
+
+		return {
+			city: {
+				name: result.name,
+				latitude: result.latitude,
+				longitude: result.longitude,
+				countryCode: result.country_code,
+				timezone: result.timezone,
+			},
+			failed: false,
+		}
+	} catch {
+		return { city: null, failed: true }
+	}
+}
+
+interface ForecastLookupResult {
+	current: CurrentWeather | null
+	units: CurrentWeatherUnits | null
+	failed: boolean
+}
+
+async function fetchForecastResult(location: City): Promise<ForecastLookupResult> {
+	if (
+		!isNonEmptyString(location.name) ||
+		!isFiniteNumber(location.latitude) ||
+		!isFiniteNumber(location.longitude) ||
+		!isNonEmptyString(location.countryCode) ||
+		!isNonEmptyString(location.timezone)
+	) {
+		return { current: null, units: null, failed: false }
+	}
+
+	const url = new URL(FORECAST_API_URL)
+	url.search = new URLSearchParams({
+		latitude: String(location.latitude),
+		longitude: String(location.longitude),
+		current: CURRENT_FIELDS,
+		timezone: location.timezone,
+	}).toString()
+
+	try {
+		const response = await fetch(url)
+
+		if (!response.ok) {
+			return { current: null, units: null, failed: true }
+		}
+
+		const data: unknown = await response.json()
+
+		if (!isForecastResponse(data)) {
+			return { current: null, units: null, failed: true }
+		}
+
+		return { current: data.current ?? null, units: data.current_units ?? null, failed: false }
+	} catch {
+		return { current: null, units: null, failed: true }
+	}
+}
+
+export async function getWeatherByCityResult(name: string): Promise<WeatherLookupResult> {
+	const cityResult = await searchCityResult(name)
+
+	if (cityResult.failed) {
+		return { ok: false, reason: 'generic' }
+	}
+
+	const city = cityResult.city
+
+	if (!city) {
+		return { ok: false, reason: 'not-found' }
+	}
+
+	const forecastResult = await fetchForecastResult(city)
+
+	if (forecastResult.failed) {
+		return { ok: false, reason: 'weather-unavailable' }
+	}
+
+	const current = forecastResult.current
+	const units = forecastResult.units
+
+	if (!current || !units) {
+		return { ok: false, reason: 'weather-unavailable' }
 	}
 
 	return {
-		city: city.name,
-		countryCode: city.countryCode,
-		timezone: city.timezone,
-		dateTime: current.time,
-		isDay: current.is_day === 1,
-		temperature: current.temperature_2m,
-		humidity: current.relative_humidity_2m,
-		apparentTemperature: current.apparent_temperature,
-		precipitationProbability: current.precipitation_probability,
-		windSpeed: current.wind_speed_10m,
-		windDirection: current.wind_direction_10m,
-		precipitation: current.precipitation,
-		weatherCode: current.weather_code,
-		condition: describeWeatherCode(current.weather_code),
+		ok: true,
+		weather: {
+			city: city.name,
+			countryCode: city.countryCode,
+			timezone: city.timezone,
+			dateTime: current.time,
+			isDay: current.is_day === 1,
+			temperature: current.temperature_2m,
+			humidity: current.relative_humidity_2m,
+			apparentTemperature: current.apparent_temperature,
+			precipitationProbability: current.precipitation_probability,
+			windSpeed: current.wind_speed_10m,
+			windDirection: current.wind_direction_10m,
+			precipitation: current.precipitation,
+			weatherCode: current.weather_code,
+			condition: describeWeatherCode(current.weather_code),
+			units: {
+				temperature: units.temperature_2m,
+				humidity: units.relative_humidity_2m,
+				apparentTemperature: units.apparent_temperature,
+				precipitationProbability: units.precipitation_probability,
+				precipitation: units.precipitation,
+				windSpeed: units.wind_speed_10m,
+				windDirection: units.wind_direction_10m,
+			},
+		},
 	}
 }

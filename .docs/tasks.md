@@ -42,7 +42,7 @@ Execute as tarefas na ordem apresentada. Cada agente deve trabalhar em uma taref
 
 ## 7. Montar a estrutura semantica da tela
 
-- [ ] Criar o HTML/DOM inicial com formulario de busca, estados de vazio, carregamento e erro, alem do painel de resultado com sidebar e area de metricas.
+- [x] Criar o HTML/DOM inicial com formulario de busca, estados de vazio, carregamento e erro, alem do painel de resultado com sidebar e area de metricas.
 - Criterio de aprovacao: a tela usa `main`, `form`, `label`, `section` e headings em hierarquia coerente; o campo tem rotulo acessivel, placeholder em portugues e o painel nao exibe dados ficticios no estado inicial.
 - Referencia: PRD, RF-01, RF-05, RF-07 e RNF-02.
 

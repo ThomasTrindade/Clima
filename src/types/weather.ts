@@ -63,4 +63,21 @@ export interface WeatherResult {
   precipitation: number
   weatherCode: number
   condition: string
+  units: WeatherResultUnits
 }
+
+export interface WeatherResultUnits {
+  temperature: string
+  humidity: string
+  apparentTemperature: string
+  precipitationProbability: string
+  precipitation: string
+  windSpeed: string
+  windDirection: string
+}
+
+export type WeatherLookupFailureReason = 'not-found' | 'weather-unavailable' | 'generic'
+
+export type WeatherLookupResult =
+  | { ok: true; weather: WeatherResult }
+  | { ok: false; reason: WeatherLookupFailureReason }
